@@ -211,4 +211,9 @@ export class DatasetService extends DataSource {
     }
     return true;
   }
+
+  async getValidLabels(): Promise<string[]> {
+    const buffer = await fs.promises.readFile("src/assets/valid_labels.json");
+    return JSON.parse(buffer.toString());
+  }
 }

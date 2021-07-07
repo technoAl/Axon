@@ -14,10 +14,11 @@ import {
   Typography
 } from "@material-ui/core";
 import gql from "graphql-tag";
-import { useApolloClient, useMutation } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { TreeItem } from "@material-ui/lab";
 import { makeStyles } from "@material-ui/core/styles";
 import { CloudDownload, ControlPoint, Create, RemoveCircleOutline } from "@material-ui/icons";
+import { GetValidLabels } from "./__generated__/GetValidLabels";
 
 const useStyles = makeStyles((theme) => ({
   link: {
@@ -62,6 +63,12 @@ enum CreateState {
   Done
 }
 
+const GET_VALID_LABELS_QUERY = gql`
+  query GetValidLabels{
+    validLabels
+  }
+`;
+
 const CREATE_DATASET_MUTATION = gql`
   mutation CreateDataset($classes: [String!]!, $maxImages: Int!) {
     createDataset(classes: $classes, maxImages: $maxImages) {
@@ -99,6 +106,9 @@ export default function CreateDatasetDialogButton(): ReactElement {
       }
     }
   });
+
+  const {data, loading, error} = useQuery<GetValidLabels>(GET_VALID_LABELS_QUERY);
+  console.log(data || 0);
 
   const handleClose = () => {
     setKeys([""]);
@@ -212,11 +222,14 @@ export default function CreateDatasetDialogButton(): ReactElement {
                 </Grid>
               )}
               <Grid item xs={10}>
+                <Typography></Typography>
                 <TextField
                   error={errors[index]}
                   helperText={errors[index] ? "Please enter a class name or remove this field." : "Class name"}
                   placeholder={"Type class name here"}
-                  onChange={(event) => update(index, event.target.value)}
+                  onChange={(event) => {
+                    update(index, event.target.value);
+                  }}
                   className={classes.textfield}
                 />
               </Grid>
